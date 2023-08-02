@@ -26,6 +26,6 @@ function vector = fiboAureo(n)
   fiboVector = fibonacci(n);
   vector = zeros(1,n+1);
   for it=1:n-1
-    vector = (fiboVector(1,it+1)  + fiboVector(1,it))/ (fiboVector(1,it+1));
+    vector(it) = (fiboVector(1,it+1)  + fiboVector(1,it))/ (fiboVector(1,it+1));
   endfor
 endfunction
