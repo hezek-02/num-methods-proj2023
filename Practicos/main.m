@@ -23,14 +23,59 @@
 ## Created: 2023-08-01
 
 tic
+#ej1a
 vector = [1 2 3 4 5 6];
 normaVec = norma(vector);
 matriz = [1 2 3 4 5 6; 3 2 1 3 2 1];
-#disp("norma euclidea personal: " + normaVec);
-#disp("norma euclidea octave: " + norm(vector));
+disp("norma euclidea personal: ");
 disp(normaVec);
+disp("norma euclidea octave: ");
 disp(norm(vector));
-raizProx = aproximarRaiz(6,25);
-disp(raizProx);
+#raizProx = aproximarRaiz(6,25);
+#disp(raizProx);
+##ej1b
 disp(sustitucion(matriz,vector,3));
+disp("  ")
+##ej1c
+M = [1 2 3 4 5 6; 3 2 1 3 2 1];
+M = intercambio(M,1,2);
+disp(M);
+
+##ej2
+disp(signo(3));
+disp(signo(0));
+disp(signo(-5));
+disp(esPar(3));
+disp(esPar(2));
+disp(max(2,10));
+disp(max(10,2));
+disp(" ")
+##ej 3
+disp(maxModif(M));
+
+##ej 4
+e = 1e-6;
+disp(serie2(@Sgeometrica,e));
+##ej5
+#a=fibonacci(25);
+#disp(a);
+b=fiboAureo(255);
+disp(" ")
+disp(b);
+#ej5
+#semillaMASIVa
+maxSem=1;
+largoMaxActual = length(collatz(maxSem,200));
+for i=1:999
+  if ( largoMaxActual< length(collatz(i,200)))
+    maxSem = i;  
+    largoMaxActual = length(collatz(i,200));
+  endif
+endfor
+  #maxSem = 871
+  disp(collatz(maxSem,200));
 toc
+
+
+
+
