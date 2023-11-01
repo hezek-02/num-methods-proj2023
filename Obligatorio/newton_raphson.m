@@ -1,24 +1,12 @@
 
-function retval = newton_raphson (x0, f, Jf, tol, max_it)
-    x = x0;  % Estimación inicial
-    k = 0;  % Inicializar el contador de iteraciones
-
-    while k < max_it
-        b = -f(x);
-        A = Jf(x);
-
-        % Resolver el sistema lineal Ad = b para encontrar d
-        d = A \ b;
-
-        x = x + d;  % Actualizar x
-
-        % Comprobar el criterio de parada
-        if norm(d) < tol
-            break;  % Detenerse si se cumple el criterio de parada
-        end
-
-        k = k + 1;  % Incrementar el contador de iteraciones
-    end
-
-
+function x = newton_raphson (x0, Jf, F, itMax)
+  x = x0;
+  k = 0;
+  while k < itMax
+    A = Jf(x(1),x(2),x(3),x(4));
+    d = A\-F(x(1),x(2),x(3),x(4));
+    x = x + d'; %tomo la trasp, x es 1x4 y d 4x1
+    k = k+1;
+  endwhile
+  return;
 endfunction
