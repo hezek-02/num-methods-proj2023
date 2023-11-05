@@ -104,3 +104,52 @@ fprintf("cant de iteraciones: %d", k2);
 fprintf("\n \n");
 
 toc
+
+###PARTE 3###
+%Coordenadas de los satelites mas juntos y sus tiempos de transmisión
+          %x        %y         %z           %t
+S_juntos = [133,   6326,   25157,   0.0 ;  %satelite 1
+       -5269,   7172,   25035,   0.0 ;  %satelite 2
+       -5038,   8349, 24716,   0.0 ;  %satelite 3
+       -4800,   7698,     24973,   0.0 ];  %satelite 4
+       
+R_j = zeros(1,4);
+t_j  = zeros (1,4);
+for i=1:4
+    R_j(1,i) = sqrt( S_juntos(i,1).^2 + S_juntos(i,2).^2 + (S_juntos(i,3) - 6370).^2 );
+    t_j(1,i) = d + R_j(1,i) / c; %tiempo de transmisión de cada satelite
+    S_juntos(i,4) = t(1,i);
+endfor
+
+%Sistema de ecs. para hallar la posición del receptor
+%Sistema de ecs. para hallar la posición del receptor y su correción temporal ( tiempo que demora en recibir la señal),x(1)=x,x(2)=y,x(3)=z, x(4) =d
+F2_juntos = @(x) [
+    sqrt((x(1) - S_juntos(1,1)).^2  +  (x(2) - S_juntos(1,2)).^2   + (x(3) - S_juntos(1,3)).^2)   -   c * (S_juntos(1,4) - d) ;
+    sqrt((x(1) - S_juntos(2,1)).^2  +  (x(2) - S_juntos(2,2)).^2   + (x(3) - S_juntos(2,3)).^2)   -   c * (S_juntos(2,4) - d) ;
+    sqrt((x(1) - S_juntos(3,1)).^2  +  (x(2) - S_juntos(3,2)).^2   + (x(3) - S_juntos(3,3)).^2)   -   c * (S_juntos(3,4) - d) ;
+    sqrt((x(1) - S_juntos(4,1)).^2  +  (x(2) - S_juntos(4,2)).^2   + (x(3) - S_juntos(4,3)).^2)   -   c * (S_juntos(4,4) - d) ;
+];
+
+%jacobina de F2, 4x3
+Jf2_juntos = @(x) [ 
+  (x(1)-S_juntos(1,1))/sqrt((x(1) - S_juntos(1,1)).^2 + (x(2) - S_juntos(1,2)).^2 + (x(3) - S_juntos(1,3)).^2),      (x(2)-S_juntos(1,2))/sqrt((x(1) - S_juntos(1,1)).^2 + (x(2) - S_juntos(1,2)).^2 + (x(3) - S_juntos(1,3)).^2),        (x(3)-S_juntos(1,3))/sqrt((x(1) - S_juntos(1,1)).^2 + (x(2) - S_juntos(1,2)).^2 + (x(3) - S_juntos(1,3)).^2);                    
+  (x(1)-S_juntos(2,1))/sqrt((x(1) - S_juntos(2,1)).^2 + (x(2) - S_juntos(2,2)).^2 + (x(3) - S_juntos(2,3)).^2),      (x(2)-S_juntos(2,2))/sqrt((x(1) - S_juntos(2,1)).^2 + (x(2) - S_juntos(2,2)).^2 + (x(3) - S_juntos(2,3)).^2),        (x(3)-S_juntos(2,3))/sqrt((x(1) - S_juntos(2,1)).^2 + (x(2) - S_juntos(2,2)).^2 + (x(3) - S_juntos(2,3)).^2);
+  (x(1)-S_juntos(3,1))/sqrt((x(1) - S_juntos(3,1)).^2 + (x(2) - S_juntos(3,2)).^2 + (x(3) - S_juntos(3,3)).^2),      (x(2)-S_juntos(3,2))/sqrt((x(1) - S_juntos(3,1)).^2 + (x(2) - S_juntos(3,2)).^2 + (x(3) - S_juntos(3,3)).^2),        (x(3)-S_juntos(3,3))/sqrt((x(1) - S_juntos(3,1)).^2 + (x(2) - S_juntos(3,2)).^2 + (x(3) - S_juntos(3,3)).^2);
+  (x(1)-S_juntos(4,1))/sqrt((x(1) - S_juntos(4,1)).^2 + (x(2) - S_juntos(4,2)).^2 + (x(3) - S_juntos(4,3)).^2),      (x(2)-S_juntos(4,2))/sqrt((x(1) - S_juntos(4,1)).^2 + (x(2) - S_juntos(4,2)).^2 + (x(3) - S_juntos(4,3)).^2),        (x(3)-S_juntos(4,3))/sqrt((x(1) - S_juntos(4,1)).^2 + (x(2) - S_juntos(4,2)).^2 + (x(3) - S_juntos(4,3)).^2);
+];
+
+%punto inicial para iteración NR
+x0 = [0, 0, 6370];
+
+
+%empleamos NR
+[res2_juntos,k2_juntos] = newton_raphson(x0, Jf2_juntos, F2_juntos, 1000,0);
+res2_juntos(4) = d;
+fprintf("\n resultado newton_raphson: ");
+disp(res2_juntos);
+fprintf("cant de iteraciones: %d", k2_juntos);
+fprintf("\n \n");
+
+
+       
+       
