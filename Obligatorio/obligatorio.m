@@ -125,7 +125,7 @@ Jf2 = @(x) [
 [res3,k3] = newton_raphson(x0, Jf2, F2, 1000,0);
 fprintf("\n resultado newton_raphson perturbado: ");
 disp(res3);
-fprintf("cant de iteraciones: %d", k2);
+fprintf("cant de iteraciones: %d", k3);
 fprintf("\n \n");
 
 error_salida = norm([res2(1)-res3(1),res2(2)-res3(2),res2(3)-res3(3)],inf)
