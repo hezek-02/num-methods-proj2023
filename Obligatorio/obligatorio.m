@@ -1,4 +1,3 @@
-
 ###PARTE 1###
 tic
 fprintf("\n \n PARTE 1 \n \n");
@@ -102,6 +101,42 @@ fprintf("\n resultado newton_raphson: ");
 disp(res2);
 fprintf("cant de iteraciones: %d", k2);
 fprintf("\n \n");
+
+%posibles permutaciones
+S(1,4) = S(1,4)(+/-)10e-8;
+S(2,4) = S(2,4)(+/-)10e-8;
+S(3,4) = S(3,4)(+/-)10e-8;
+S(4,4) = S(4,4)(+/-)10e-8;
+
+F2 = @(x) [
+    sqrt((x(1) - S(1,1)).^2  +  (x(2) - S(1,2)).^2   + (x(3) - S(1,3)).^2)   -   c * (S(1,4) - d) ;
+    sqrt((x(1) - S(2,1)).^2  +  (x(2) - S(2,2)).^2   + (x(3) - S(2,3)).^2)   -   c * (S(2,4) - d) ;
+    sqrt((x(1) - S(3,1)).^2  +  (x(2) - S(3,2)).^2   + (x(3) - S(3,3)).^2)   -   c * (S(3,4) - d) ;
+    sqrt((x(1) - S(4,1)).^2  +  (x(2) - S(4,2)).^2   + (x(3) - S(4,3)).^2)   -   c * (S(4,4) - d) ;
+];
+
+Jf2 = @(x) [
+  (x(1)-S(1,1))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),      (x(2)-S(1,2))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),        (x(3)-S(1,3))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2);
+  (x(1)-S(2,1))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),      (x(2)-S(2,2))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),        (x(3)-S(2,3))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2);
+  (x(1)-S(3,1))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),      (x(2)-S(3,2))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),        (x(3)-S(3,3))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2);
+  (x(1)-S(4,1))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),      (x(2)-S(4,2))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),        (x(3)-S(4,3))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2);
+];
+
+[res3,k3] = newton_raphson(x0, Jf2, F2, 1000,0);
+fprintf("\n resultado newton_raphson perturbado: ");
+disp(res3);
+fprintf("cant de iteraciones: %d", k2);
+fprintf("\n \n");
+
+error_salida = norm([res2(1)-res3(1),res2(2)-res3(2),res2(3)-res3(3)],inf)
+factor_de_incremento = error_salida/(c*10e-8)
+
+errores_de_salida = [0.063639,0.066610 ,0.085621, 0.035945 ,0.044490,0.051014, 0.094733, 0.02991, 0.051015, 0.085620, 0.066611]; %calculados a mano
+max_err_salida = max(errores_de_salida)
+factores_de_incremento = [2.1228, 2.2219, 2.8560, 1.1990, 1.4840, 1.7016, 3.1599, 0.9977, 3.1600, 1.7017]; %calculados a mano
+num_cond = max(factores_de_incremento)
+
+%
 
 toc
 
