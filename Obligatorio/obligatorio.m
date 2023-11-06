@@ -131,9 +131,10 @@ fprintf("\n \n");
 error_salida = norm([res2(1)-res3(1),res2(2)-res3(2),res2(3)-res3(3)],inf)
 factor_de_incremento = error_salida/(c*10e-8)
 
-errores_de_salida = [0.063639,0.066610 ,0.085621, 0.035945 ,0.044490,0.051014, 0.094733, 0.02991, 0.051015, 0.085620, 0.066611]; %calculados a mano
+%luego de calcular cada valor por separado
+errores_de_salida = [0.063639,0.066610 ,0.085621, 0.035945 ,0.044490,0.051014, 0.094733, 0.02991, 0.051015, 0.085620, 0.066611]; 
 max_err_salida = max(errores_de_salida)
-factores_de_incremento = [2.1228, 2.2219, 2.8560, 1.1990, 1.4840, 1.7016, 3.1599, 0.9977, 3.1600, 1.7017]; %calculados a mano
+factores_de_incremento = [2.1228, 2.2219, 2.8560, 1.1990, 1.4840, 1.7016, 3.1599, 0.9977, 3.1600, 1.7017]; 
 num_cond = max(factores_de_incremento)
 
 %
@@ -185,6 +186,39 @@ disp(res2_juntos);
 fprintf("cant de iteraciones: %d", k2_juntos);
 fprintf("\n \n");
 
+%posibles permutaciones
+S_juntos(1,4) = S_juntos(1,4)(+/-)10e-8;
+S_juntos(2,4) = S_juntos(2,4)(+/-)10e-8;
+S_juntos(3,4) = S_juntos(3,4)(+/-)10e-8;
+S_juntos(4,4) = S_juntos(4,4)(+/-)10e-8;
 
+F2_juntos = @(x) [
+    sqrt((x(1) - S_juntos(1,1)).^2  +  (x(2) - S_juntos(1,2)).^2   + (x(3) - S_juntos(1,3)).^2)   -   c * (S_juntos(1,4) - d) ;
+    sqrt((x(1) - S_juntos(2,1)).^2  +  (x(2) - S_juntos(2,2)).^2   + (x(3) - S_juntos(2,3)).^2)   -   c * (S_juntos(2,4) - d) ;
+    sqrt((x(1) - S_juntos(3,1)).^2  +  (x(2) - S_juntos(3,2)).^2   + (x(3) - S_juntos(3,3)).^2)   -   c * (S_juntos(3,4) - d) ;
+    sqrt((x(1) - S_juntos(4,1)).^2  +  (x(2) - S_juntos(4,2)).^2   + (x(3) - S_juntos(4,3)).^2)   -   c * (S_juntos(4,4) - d) ;
+];
+
+Jf2_juntos = @(x) [
+  (x(1)-S_juntos(1,1))/sqrt((x(1) - S_juntos(1,1)).^2 + (x(2) - S_juntos(1,2)).^2 + (x(3) - S_juntos(1,3)).^2),      (x(2)-S_juntos(1,2))/sqrt((x(1) - S_juntos(1,1)).^2 + (x(2) - S_juntos(1,2)).^2 + (x(3) - S_juntos(1,3)).^2),        (x(3)-S_juntos(1,3))/sqrt((x(1) - S_juntos(1,1)).^2 + (x(2) - S_juntos(1,2)).^2 + (x(3) - S_juntos(1,3)).^2);
+  (x(1)-S_juntos(2,1))/sqrt((x(1) - S_juntos(2,1)).^2 + (x(2) - S_juntos(2,2)).^2 + (x(3) - S_juntos(2,3)).^2),      (x(2)-S_juntos(2,2))/sqrt((x(1) - S_juntos(2,1)).^2 + (x(2) - S_juntos(2,2)).^2 + (x(3) - S_juntos(2,3)).^2),        (x(3)-S_juntos(2,3))/sqrt((x(1) - S_juntos(2,1)).^2 + (x(2) - S_juntos(2,2)).^2 + (x(3) - S_juntos(2,3)).^2);
+  (x(1)-S_juntos(3,1))/sqrt((x(1) - S_juntos(3,1)).^2 + (x(2) - S_juntos(3,2)).^2 + (x(3) - S_juntos(3,3)).^2),      (x(2)-S_juntos(3,2))/sqrt((x(1) - S_juntos(3,1)).^2 + (x(2) - S_juntos(3,2)).^2 + (x(3) - S_juntos(3,3)).^2),        (x(3)-S_juntos(3,3))/sqrt((x(1) - S_juntos(3,1)).^2 + (x(2) - S_juntos(3,2)).^2 + (x(3) - S_juntos(3,3)).^2);
+  (x(1)-S_juntos(4,1))/sqrt((x(1) - S_juntos(4,1)).^2 + (x(2) - S_juntos(4,2)).^2 + (x(3) - S_juntos(4,3)).^2),      (x(2)-S_juntos(4,2))/sqrt((x(1) - S_juntos(4,1)).^2 + (x(2) - S_juntos(4,2)).^2 + (x(3) - S_juntos(4,3)).^2),        (x(3)-S_juntos(4,3))/sqrt((x(1) - S_juntos(4,1)).^2 + (x(2) - S_juntos(4,2)).^2 + (x(3) - S_juntos(4,3)).^2);
+];
+
+[res3_juntos,k3_juntos] = newton_raphson(x0, Jf2_juntos, F2_juntos, 1000,0);
+fprintf("\n resultado newton_raphson perturbado: ");
+disp(res3_juntos);
+fprintf("cant de iteraciones: %d", k3_juntos);
+fprintf("\n \n");
+
+error_salida = norm([res2_juntos(1)-res3_juntos(1),res2_juntos(2)-res3_juntos(2),res2_juntos(3)-res3_juntos(3)],inf)
+factor_de_incremento = error_salida/(c*10e-8)
+
+%luego de calcular cada valor por separado
+errores_de_salida = [0.028021, 0.056069, 0.9209, 0.9244, 0.9175, 0.8962, 0.1628, 0.2225];
+max_err_salida = max(errores_de_salida)
+factores_de_incremento = [0.9347, 1.8703, 30.718, 31.428, 30.603, 29.893, 5.4301, 7.4204];
+num_cond = max(factores_de_incremento)
        
        
