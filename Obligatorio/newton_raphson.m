@@ -2,9 +2,9 @@
 function [x,k] = newton_raphson (x0, Jf, F, itMax, critExtra)
   k = 0;
   x = x0;
-  xAnt = x +100.* 100;
+  xAnt = inf;
   if critExtra == 1
-    while norm(x-xAnt,2)  > 1e-6 &&  k < itMax
+    while norm(x-xAnt,2)  > 1e-9 &&  k < itMax
       xAnt = x;
       A = Jf(x);
       d = A\-F(x);
