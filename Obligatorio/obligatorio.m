@@ -12,27 +12,15 @@ S = [15600,   7540,   20140,   0.07074 ;  %satelite 1
 c = 299792.458; %km/s
 
 %Sistema de ecs. para hallar la posición del receptor y su correción temporal ( tiempo que demora en recibir la señal),x(1)=x,x(2)=y,x(3)=z, x(4) =d
-F = @(x) [
-    sqrt((x(1) - S(1,1)).^2  +  (x(2) - S(1,2)).^2   + (x(3) - S(1,3)).^2)   -   c * (S(1,4) - x(4)) ;
-    sqrt((x(1) - S(2,1)).^2  +  (x(2) - S(2,2)).^2   + (x(3) - S(2,3)).^2)   -   c * (S(2,4) - x(4)) ;
-    sqrt((x(1) - S(3,1)).^2  +  (x(2) - S(3,2)).^2   + (x(3) - S(3,3)).^2)   -   c * (S(3,4) - x(4)) ;
-    sqrt((x(1) - S(4,1)).^2  +  (x(2) - S(4,2)).^2   + (x(3) - S(4,3)).^2)   -   c * (S(4,4) - x(4)) ;
-];
-
-%jacobina de F  4x4
-Jf = @(x) [ 
-  (x(1)-S(1,1))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),      (x(2)-S(1,2))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),        (x(3)-S(1,3))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),   c ;                        
-  (x(1)-S(2,1))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),      (x(2)-S(2,2))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),        (x(3)-S(2,3))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),   c ;
-  (x(1)-S(3,1))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),      (x(2)-S(3,2))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),        (x(3)-S(3,3))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),   c ;
-  (x(1)-S(4,1))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),      (x(2)-S(4,2))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),        (x(3)-S(4,3))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),   c ;
-];
+F = @(x) sistema_ecs(x,S,0);
+JF = @(x) Jacobiana(x,S);
 
 %vector inicial para iteración NR
 x0 = [0, 0, 6370, 0];
 
 %empleamos NR
-[res1,k1] = newton_raphson(x0, Jf, F, 1000, 1);
-fprintf("\nResultado newton_raphson: x=%d  y=%d  z=%d  t=%d \n",res1(1),res1(2),res1(3),res1(4));
+[res1,k1] = newton_raphson(x0, JF, F, 250, 1);
+fprintf("\nResultado newton_raphson: (x=%d  y=%d  z=%d  d=%d)\n",res1(1),res1(2),res1(3),res1(4));
 %disp(res1);
 fprintf("cant de iteraciones: %d \n \n", k1);
 
@@ -46,7 +34,7 @@ d = 0.0001; %cte de letra: corrección temporal
 
 fi = [0, pi/6, pi/4, pi/3];
 
-theta = [0, pi/4, 3*pi/4, pi]; %valores distintos dos a dos
+theta = [pi/3, pi/4, 3*pi/4, pi]; %valores distintos dos a dos
 
 %Coordenadas de los satelites y sus tiempos de transmisión
                         %x                                                 %y                              %z            %t 
@@ -63,91 +51,66 @@ for i=1:4
     S(i,4) = t(1,i);
 endfor
 
-%Sistema de ecs. para hallar la posición del receptor
-F2 = @(x) [
-    sqrt((x(1) - S(1,1)).^2  +  (x(2) - S(1,2)).^2   + (x(3) - S(1,3)).^2)   -   c * (S(1,4) - d) ;
-    sqrt((x(1) - S(2,1)).^2  +  (x(2) - S(2,2)).^2   + (x(3) - S(2,3)).^2)   -   c * (S(2,4) - d) ;
-    sqrt((x(1) - S(3,1)).^2  +  (x(2) - S(3,2)).^2   + (x(3) - S(3,3)).^2)   -   c * (S(3,4) - d) ;
-    sqrt((x(1) - S(4,1)).^2  +  (x(2) - S(4,2)).^2   + (x(3) - S(4,3)).^2)   -   c * (S(4,4) - d) ;
-];
-
-%jacobina de F2, 4x3
-Jf2 = @(x) [ 
-  (x(1)-S(1,1))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),      (x(2)-S(1,2))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),        (x(3)-S(1,3))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2);                    
-  (x(1)-S(2,1))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),      (x(2)-S(2,2))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),        (x(3)-S(2,3))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2);
-  (x(1)-S(3,1))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),      (x(2)-S(3,2))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),        (x(3)-S(3,3))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2);
-  (x(1)-S(4,1))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),      (x(2)-S(4,2))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),        (x(3)-S(4,3))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2);
-];
+F = @(x) sistema_ecs(x,S,d);
+JF = @(x) Jacobiana(x,S);
 
 %punto inicial para iteración NR
 x0 = [0, 0, 6370];
 
 %empleamos NR
-[res2,k2] = newton_raphson(x0, Jf2, F2, 1000,0);
+[res2,k2] = newton_raphson(x0, JF, F, 250, 1);
+%[res2,k2] = newton_raphson(x0, Jf2, F2, 250, 1); criterio extra de corte
 res2(4) = d; % le añado su correccion temporal dado por letra
-fprintf("\nResultado newton_raphson: x=%d  y=%d  z=%d  t=%d \n",res2(1),res2(2),res2(3),res2(4));
+fprintf("\nResultado newton_raphson: (x=%d  y=%d  z=%d  d=%d) \n",res2(1),res2(2),res2(3),res2(4));
 %disp(res2);
 fprintf("cant de iteraciones: %d", k2);
-fprintf("\n \n");
+distancia_pto_real = sqrt( (res2(1) - x0(1))^2 + (res2(2) - x0(2))^2 + (res2(3) - x0(3))^2 );
+
+fprintf("\ndistancia_pto_real:%d \n",distancia_pto_real);
 
 %posibles permutaciones
+                  %t1       %t2         %t3          %t4
 delta_ti = [ 10e-8,    10e-8,    10e-8,     10e-8;
-
                  -10e-8,   10e-8,    10e-8,      10e-8;
                   10e-8,    -10e-8,   10e-8,      10e-8;
                   10e-8,    10e-8,    -10e-8,     10e-8;
                   10e-8,    10e-8,     10e-8,    -10e-8;
-
                   -10e-8,   -10e-8,   10e-8,      10e-8;
                   -10e-8,   10e-8,    -10e-8,     10e-8;
                   -10e-8,   10e-8,    10e-8,     -10e-8;
                   10e-8,    -10e-8,   -10e-8,     10e-8;
                   10e-8,    -10e-8,    10e-8,    -10e-8;
                   10e-8,    10e-8,    -10e-8,    -10e-8;
-
                   -10e-8,   -10e-8,   -10e-8,    10e-8;
                   -10e-8,   10e-8,    -10e-8,    -10e-8;
                   -10e-8,   -10e-8,   10e-8,     -10e-8;
                   10e-8,    -10e-8,   -10e-8,    -10e-8;
-                  
                   -10e-8,   -10e-8,   -10e-8,    -10e-8];
 
 %t(1,i); sin alterar
-error_salida = zeros(16);
-factor_de_incremento = zeros(16);
+errores_de_salida = zeros(1,16);
+factores_de_incremento = zeros(1,16);
 for i=1:16
   S(1,4) = t(1,1) + delta_ti(i,1);
   S(2,4) = t(1,2) + delta_ti(i,2);
-  S(3,4) = t(1,3) + delta_ti(i,3);;
+  S(3,4) = t(1,3) + delta_ti(i,3);
   S(4,4) = t(1,4) + delta_ti(i,4);
+  
+  F = @(x) sistema_ecs(x,S,d);
+  JF = @(x) Jacobiana(x,S);
 
-  F2 = @(x) [
-      sqrt((x(1) - S(1,1)).^2  +  (x(2) - S(1,2)).^2   + (x(3) - S(1,3)).^2)   -   c * (S(1,4) - d) ;
-      sqrt((x(1) - S(2,1)).^2  +  (x(2) - S(2,2)).^2   + (x(3) - S(2,3)).^2)   -   c * (S(2,4) - d) ;
-      sqrt((x(1) - S(3,1)).^2  +  (x(2) - S(3,2)).^2   + (x(3) - S(3,3)).^2)   -   c * (S(3,4) - d) ;
-      sqrt((x(1) - S(4,1)).^2  +  (x(2) - S(4,2)).^2   + (x(3) - S(4,3)).^2)   -   c * (S(4,4) - d) ;
-  ];
+  x0 = [0, 0, 6370];
+  
+  [res3,k3] = newton_raphson(x0, JF, F, 250, 1);
+  %[res3,k3] = newton_raphson(x0, Jf2, F2, 250, 1); %criterio de corte adicional
 
-  Jf2 = @(x) [
-    (x(1)-S(1,1))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),      (x(2)-S(1,2))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2),        (x(3)-S(1,3))/sqrt((x(1) - S(1,1)).^2 + (x(2) - S(1,2)).^2 + (x(3) - S(1,3)).^2);
-    (x(1)-S(2,1))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),      (x(2)-S(2,2))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2),        (x(3)-S(2,3))/sqrt((x(1) - S(2,1)).^2 + (x(2) - S(2,2)).^2 + (x(3) - S(2,3)).^2);
-    (x(1)-S(3,1))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),      (x(2)-S(3,2))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2),        (x(3)-S(3,3))/sqrt((x(1) - S(3,1)).^2 + (x(2) - S(3,2)).^2 + (x(3) - S(3,3)).^2);
-    (x(1)-S(4,1))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),      (x(2)-S(4,2))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2),        (x(3)-S(4,3))/sqrt((x(1) - S(4,1)).^2 + (x(2) - S(4,2)).^2 + (x(3) - S(4,3)).^2);
-  ];
+  fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
 
-  [res3,k3] = newton_raphson(x0, Jf2, F2, 1000,1);
-fprintf("\nNewton_raphson perturdado,  con delta_ti= %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
+  fprintf("resultado: (x=%d  y=%d  z=%d)\n", res3(1),res3(2),res3(3));
+  fprintf("cant de iteraciones: %d\n", k3);
 
-fprintf("resultado, x=%d  y=%d  z=%d:\n", res3(1),res3(2),res3(3));
-##  disp(res3);
-##  fprintf("cant de iteraciones: %d", k3);
-##  fprintf("\n \n");
-
-  errores_de_salida(i) = norm([res2(1)-res3(1),res2(2)-res3(2),res2(3)-res3(3)],inf); %‖(∆x, ∆y, ∆z)‖∞
-  factores_de_incremento(i) = errores_de_salida(i)/(c*10e-8);
-
-  %luego de calcular cada valor por separado
-
+  errores_de_salida(1,i) = norm([res2(1) - res3(1),res2(2) - res3(2),res2(3) - res3(3)],inf); %‖(∆x, ∆y, ∆z)‖∞
+  factores_de_incremento(1,i) = errores_de_salida(1,i)/(c*10e-8);
 
 endfor
 max_err_salida = max(errores_de_salida);
