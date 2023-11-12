@@ -10,7 +10,7 @@ S = [15600,   7540,   20140,   0.07074 ;  %satelite 1
 c = 299792.458; %km/s
 
 F = @(x) sistema_ecs(x,S,0);
-JF = @(x) jacobiana(x,S);
+JF = @(x) jacobiana(x,S,0);
 
 x0 = [0, 0, 6370, 0];
 
@@ -48,7 +48,7 @@ for i=1:4
 endfor
 
 F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S);
+JF = @(x) jacobiana(x,S,0);
 
 x0 = [0, 0, 6370];
 
@@ -69,7 +69,7 @@ for i=1:16
     S(4,4) = t(1,4) + delta_ti(i,4);
 
     F = @(x) sistema_ecs(x,S,d);
-    JF = @(x) jacobiana(x,S);
+    JF = @(x) jacobiana(x,S,0);
 
     x0 = [0, 0, 6370];
 
@@ -96,6 +96,7 @@ fprintf("numero de condicion: %d\n ", num_cond);
 
 
 ###PARTE 3###
+fprintf("\n \n PARTE 3 \n \n");
 
 %Coordenadas de los satelites mas juntos
          %x        %y         %z             %t
@@ -113,10 +114,9 @@ for i=1:4
     S(i,4) = t_j(1,i);
 endfor
 
-F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S);
-
 x0 = [0, 0, 6370];
+F = @(x) sistema_ecs(x,S,d);
+JF = @(x) jacobiana(x,S,0);
 
 [res2,k2] = newton_raphson(x0, JF, F, 250, 1);
 res2(4) = d; 
@@ -137,7 +137,7 @@ for i=1:16
   S(4,4) = t_j(1,4) + delta_ti(i,4);
   
   F = @(x) sistema_ecs(x,S,d);
-  JF = @(x) jacobiana(x,S);
+  JF = @(x) jacobiana(x,S,0);
 
   x0 = [0, 0, 6370];
   
@@ -166,36 +166,40 @@ fprintf("numero de condicion: %d\n ", num_cond);
 
 
 ###PARTE 4 ###
+fprintf("\n \n PARTE 4 \n \n");
+
 d = 0.0001;
 
-y = [0, 0, 6370, d]; %sol del sitema
+S = [133,           347,        26567;
+         24214,     -7393,      8061  ;
+         -25087,    -5690,      6651  ;
+         -24025,    2219,       11129;
+         -10347,    -16476,   18096;
+         4948,        19967,    16816;
+         -6251,       25465,    4291  ;
+         -13410,     -21235,  8673] ;
 
-S = [133,           347,        26567,  0;
-         24214,     -7393,      8061,    0;
-         -25087,    -5690,      6651,    0;
-         -24025,    2219,       11129,  0;
-         -10347,    -16476,   18096,  0;
-         4948,        19967,    16816,  0;
-         -6251,       25465,    4291,    0;
-         -13410,     -21235,  8673,    0];
-
-R = zeros(1,4);
-t  = zeros (1,4);
-for i=1:4
+R = zeros(1,8);
+t  = zeros(1,8);
+for i =1:8
     R(1,i) = sqrt( S(i,1).^2 + S(i,2).^2 + (S(i,3) - 6370).^2 );
     t(1,i) = d + R(1,i) / c;
-    S(i,4) = t(1,i);
 endfor
 
 F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S);
+JF = @(x) jacobiana(x,S,8);
  
-x0 = [0, 0, 3670, 0];
+%xSol =   [0, 0, 3670, d];
 
-[res2,k2] = gauss_newton(x0,y, JF, F, 1e-9, 50);
+y = zeros(8,1);
+y = c * t(1,1:8)';
+
+x0 = [0, 0, 6370, 0];
+
+[res2,k2] = gauss_newton(x0,y, JF, F, 1e-9, 250);
 
 fprintf("\nResultado gauss_newton: (x=%d  y=%d  z=%d  d=%d) \n",res2(1),res2(2),res2(3),res2(4));
-fprintf("cant de iteraciones: %d", k2);
+fprintf("cant de iteraciones: %d \n", k2);
 
 ###FIN PARTE 4 ###
 

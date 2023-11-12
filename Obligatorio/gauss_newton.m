@@ -22,17 +22,17 @@
 ## Author: Ezequiel Capó <hezek@heze-Makina>
 ## Created: 2023-11-10
 
-function [x,k] = gauss_newton(x0,y, JF, F, tol, itMax)
+function [x,k] = gauss_newton(x0,y,JF,F,tol,itMax)
   x = x0;
   k = 0;
   dif = inf;
-  while (k<itMax) && (dif > tol)
-      r = y' - F(x);
+  while (k<itMax) && (norm(dif) > tol)
+      r = F(x) - y;
       [U,S,V] = svd(JF(x));
-      z = U'*((-1)*r);
-      w = S(1:4,1:4) \ z;
+      z = U' * (-r);
+      w = S(1:4,1:4) \ z(1:4);
       dif = V*w;
       x = x + dif;
       k = k+1;
-  endwhile
+ endwhile
 endfunction
