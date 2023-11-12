@@ -1,3 +1,9 @@
+###VARIABLES GLOBALES/CTES###
+
+tol = 1e-9
+itMax = 250;
+c = 299792.458; %km/s
+
 ###PARTE 1###
 fprintf("\n \n PARTE 1 \n \n");
 %Coordenadas de los satelites y sus tiempos de transmisión
@@ -7,14 +13,12 @@ S = [15600,   7540,   20140,   0.07074 ;  %satelite 1
        17610,   14630, 13480,   0.07690  ;  %satelite 3
        19170,   610,     18390,   0.07242  ];  %satelite 4
 
-c = 299792.458; %km/s
-
 F = @(x) sistema_ecs(x,S,0);
 JF = @(x) jacobiana(x,S,0);
 
 x0 = [0, 0, 6370, 0];
 
-[res1,k1] = newton_raphson(x0, JF, F, 250, 1);
+[res1,k1] = newton_raphson(x0, JF, F, tol, itMax);
 fprintf("\nResultado newton_raphson: (x=%d  y=%d  z=%d  d=%d)\n",res1(1),res1(2),res1(3),res1(4));
 fprintf("cant de iteraciones: %d \n \n", k1);
 ###FIN PARTE1###
@@ -52,7 +56,7 @@ JF = @(x) jacobiana(x,S,0);
 
 x0 = [0, 0, 6370];
 
-[res2,k2] = newton_raphson(x0, JF, F, 250, 1);
+[res2,k2] = newton_raphson(x0, JF, F, tol, itMax);
 res2(4) = d; % le añado su correccion temporal dado por letra
 fprintf("\nResultado newton_raphson: (x=%d  y=%d  z=%d  d=%d) \n",res2(1),res2(2),res2(3),res2(4));
 fprintf("cant de iteraciones: %d", k2);
@@ -73,7 +77,7 @@ for i=1:16
 
     x0 = [0, 0, 6370];
 
-    [res3,k3] = newton_raphson(x0, JF, F, 250, 1);
+    [res3,k3] = newton_raphson(x0, JF, F, tol, itMax);
     fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
 
     fprintf("resultado: (x=%d  y=%d  z=%d)\n", res3(1),res3(2),res3(3));
@@ -118,7 +122,7 @@ x0 = [0, 0, 6370];
 F = @(x) sistema_ecs(x,S,d);
 JF = @(x) jacobiana(x,S,0);
 
-[res2,k2] = newton_raphson(x0, JF, F, 250, 1);
+[res2,k2] = newton_raphson(x0, JF, F, tol, itMax);
 res2(4) = d; 
 
 fprintf("\nResultado newton_raphson: (x=%d  y=%d  z=%d  d=%d) \n",res2(1),res2(2),res2(3),res2(4));
@@ -141,7 +145,7 @@ for i=1:16
 
   x0 = [0, 0, 6370];
   
-  [res3,k3] = newton_raphson(x0, JF, F, 250, 1);
+  [res3,k3] = newton_raphson(x0, JF, F, tol, itMax);
 
   fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
 
@@ -196,11 +200,65 @@ y = c * t(1,1:8)';
 
 x0 = [0, 0, 6370, 0];
 
-[res2,k2] = gauss_newton(x0,y, JF, F, 1e-9, 250);
+[res2,k2] = gauss_newton(x0,y, JF, F, tol, itMax);
 
 fprintf("\nResultado gauss_newton: (x=%d  y=%d  z=%d  d=%d) \n",res2(1),res2(2),res2(3),res2(4));
 fprintf("cant de iteraciones: %d \n", k2);
 
+distancia_pto_real = sqrt( (res2(1) - x0(1))^2 + (res2(2) - x0(2))^2 + (res2(3) - x0(3))^2 );
+fprintf("\ndistancia_pto_real:%d \n",distancia_pto_real);
+
+delta_ti = perturbaciones(2);
+errores_de_salida_minCuadrados = zeros(1,256);
+factores_de_incremento_minCuadrados = zeros(1,256);
+for i=1:256
+    y (1,1) = c * (t(1,1) + delta_ti(i,1));
+    y (2,1) = c * (t(1,2) + delta_ti(i,2));
+    y (3,1) = c * (t(1,3) + delta_ti(i,3));
+    y (4,1) = c * (t(1,4) + delta_ti(i,4));
+    y (5,1) = c * (t(1,5) + delta_ti(i,5));
+    y (6,1) = c * (t(1,6) + delta_ti(i,6));
+    y (7,1) = c * (t(1,7) + delta_ti(i,7));
+    y (8,1) = c * (t(1,8) + delta_ti(i,8));
+
+    F = @(x) sistema_ecs(x,S,d);
+    JF = @(x) jacobiana(x,S,8);
+
+    [res3,k3] = gauss_newton(x0, y, JF, F, tol, itMax);
+    
+    fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d, %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4),delta_ti(i,5), delta_ti(i,6), delta_ti(i,7), delta_ti(i,8));
+    fprintf("resultado: (x=%f  y=%f  z=%f)\n", res3(1), res3(2), res3(3), res3(4));
+    fprintf("cant de iteraciones: %d\n", k3);
+
+    errores_de_salida_minCuadrados(1,i) = norm([res2(1) - res3(1),res2(2) - res3(2),res2(3) - res3(3), res2(4) - res3(4)],inf); %‖(∆x, ∆y, ∆z)‖∞
+    factores_de_incremento_minCuadrados(1,i) = errores_de_salida_minCuadrados(1,i)/(c*10e-8);
+endfor
+max_err_salida = max(errores_de_salida_minCuadrados);
+num_cond = max(factores_de_incremento_minCuadrados);
+fprintf("\n mayor error de salida: %d\n ", max_err_salida);
+fprintf("numero de condicion: %d\n ", num_cond);
+
+###Comparación  de errores perturbados, caso satelites juntos y muchos satélites 8 (min cuad)
+% Gráfica de errores perturbados
+figure(1)
+plot(1:16, log(errores_de_salida(1:16)+1), '-b.', 1:256, log(errores_de_salida_minCuadrados(1:256)+1), '-r.');
+title('Comparación de Errores Perturbados');
+xlabel('Perturbación');
+ylabel('Log(Error + 1)');
+legend('Errores ', 'Errores Mínimos Cuadrados');
+
+% Gráfica de factores de incremento
+figure(2)
+plot(1:16, log(factores_de_incremento(1:16)+1), '-b.', 1:256, log(factores_de_incremento_minCuadrados(1:256)+1), '-r.');
+title('Comparación de Factores de Increm ento del error');
+xlabel('Perturbación');
+ylabel('Log(Factor de Incremento + 1)');
+legend('Factores ', 'Factores Mínimos Cuadrados');
+
+##figure(1)
+##plot(1:16, errores_de_salida(1:16), '-b.',1:256, errores_de_salida_minCuadrados(1:256), '-r.');
+##figure(2)
+##plot( 1:16, factores_de_incremento(1:16), '-b.', 1:256, factores_de_incremento_minCuadrados(1:256),'-r.');
 ###FIN PARTE 4 ###
 
        

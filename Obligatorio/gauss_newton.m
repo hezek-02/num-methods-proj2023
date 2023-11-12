@@ -1,10 +1,10 @@
 
 
-function [x,k] = gauss_newton(x0,y,JF,F,tol,itMax)
+function [x,k] = gauss_newton(x0, y, JF, F, tol, itMax)
   x = x0;
   k = 0;
   dif = inf;
-  while (k<itMax) && (norm(dif) > tol)
+  while (k <itMax) && (norm(dif) > tol)
       r = F(x) - y;
       [U,S,V] = svd(JF(x));
       z = U' * (-r);

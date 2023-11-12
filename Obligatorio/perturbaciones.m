@@ -9,6 +9,7 @@ if (tipo == 1)
         end
     end
   pert = 2 * -10e-8 * pert + 10e-8; 
+  
  elseif (tipo == 2)
     pert = zeros(256,8);
     for j = 0:255
@@ -17,7 +18,7 @@ if (tipo == 1)
             pert(j+1,k) = str2num(tira(k));
         end
     end
-    pert = 2*pert-1;
+  pert = 2 * -10e-8 * pert + 10e-8; 
 endif
 retval = pert;
 return;
