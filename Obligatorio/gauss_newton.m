@@ -14,30 +14,25 @@
 ## along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn {} {@var{retval} =} combinaciones_delta_ti (@var{input1}, @var{input2})
+## @deftypefn {} {@var{retval} =} gauss_newton (@var{input1}, @var{input2})
 ##
 ## @seealso{}
 ## @end deftypefn
 
 ## Author: Ezequiel Capó <hezek@heze-Makina>
-## Created: 2023-11-09
+## Created: 2023-11-10
 
-function combinaciones = combinaciones_delta_ti()
-    valores = [1e-8, 1e8];
-    num_valores = 2;
-    num_espacios = 4;
-    % Calcula el número total de combinaciones posibles
-    num_combinaciones = num_espacios^num_valores;
-    % Inicializa la matriz para almacenar las combinaciones
-    combinaciones = zeros(num_combinaciones, num_espacios);
-
-    % Genera todas las combinaciones
-    for i = 1:num_combinaciones
-        indice_actual = i;
-        for j = 1:num_espacios
-            combinaciones(i, j) = valores(mod(indice_actual-1, num_valores) + 1);
-            indice_actual = floor((indice_actual-1) / num_valores);
-        end
-    end
-
+function [x,k] = gauss_newton(x0,y,JF,F,tol,itMax)
+  x = x0;
+  k = 0;
+  dif = inf;
+  while (k<itMax) && (norm(dif) > tol)
+      r = F(x) - y;
+      [U,S,V] = svd(JF(x));
+      z = U' * (-r);
+      w = S(1:4,1:4) \ z(1:4);
+      dif = V*w;
+      x = x + dif;
+      k = k+1;
+ endwhile
 endfunction
