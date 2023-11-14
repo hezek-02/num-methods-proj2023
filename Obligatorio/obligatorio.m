@@ -261,4 +261,41 @@ legend('Factores ', 'Factores Mínimos Cuadrados');
 ##plot( 1:16, factores_de_incremento(1:16), '-b.', 1:256, factores_de_incremento_minCuadrados(1:256),'-r.');
 ###FIN PARTE 4 ###
 
+## PARTE 5 ##
+fprintf("\n \n PARTE 5 \n \n");
+
+d = 0.0001;
+c = 299792.458; %km/s
+rho = 26570; %km
+
+t_5s = [0.0678669,0.0735332,0.0835988,0.1031279,0.1093036,0.0990338];
+t_0s = [0.0678670,0.0735332,0.0835987,0.1031277,0.1093034,0.0990337];
+theta = [pi/3,7*pi/11,4*pi/5,9*pi/8,4*pi/3,16*pi/9];
+
+        %x                  %y        
+S = [rho*cos(theta(1)), rho*sin(theta(1)); %satelite 1
+     rho*cos(theta(2)), rho*sin(theta(2)); %satelite 2
+     rho*cos(theta(3)), rho*sin(theta(3)); %satelite 3
+     rho*cos(theta(4)), rho*sin(theta(4)); %satelite 4
+     rho*cos(theta(5)), rho*sin(theta(5)); %satelite 5
+     rho*cos(theta(6)), rho*sin(theta(6))]; %satelite 6
+
+F = @(x) sistema_ecs(x,S,d);
+JF = @(x) jacobiana(x,S,0);
+y = zeros(6,1);
+
+x0 = [0,0,0];
+
+y = c * t_5s(1,1:6)'
+[res1,k1] = gauss_newton(x0,y, JF, F, tol, itMax);
+
+y = c * t_0s(1,1:6)'
+[res2,k2] = gauss_newton(x0,y, JF, F, tol, itMax);
+
+fprintf("\nLa ubicación del globo en -5s es: (x=%.15d  y=%.15d  d=%.15d) \n",res1(1),res1(2),res1(3))
+fprintf("cant de iteraciones: %d \n", k1);
+
+fprintf("\nLa ubicación del globo en 0s es: (x=%.15d  y=%.15d  d=%.15d) \n",res2(1),res2(2),res2(3))
+fprintf("cant de iteraciones: %d \n", k2);
+
        
