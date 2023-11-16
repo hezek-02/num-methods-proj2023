@@ -314,7 +314,7 @@ g = @(rho) 3.986e5./ (rho^2);  %km^3/s^2
 k = 1; %cte
 M = 1; %1kg;
 
-v = @(y) sqrt( y(2)^2 +y(1)*y(3)^2 );
+v = @(y) sqrt( y(3)^2 +y(1)*y(4)^2 );
 %y(1)  = rho
 %y(2) = theta
 %y(3) = rho'
@@ -345,7 +345,7 @@ xlabel('Tiempo');
 ylabel('Theta');
 title('Solución de la Ecuación Diferencial: Theta');
 
-fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  ,\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f,  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end-4:end-1,1:3)), t(end),  sol(end-2,2), sol(end-2,2)*180/pi);
+fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  (km/s),\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f  (segundos),  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end,:)), t(end),  sol(end,2), sol(end,2)*180/pi);
 
 ##figure(1);
 ##plot(t, y, 'r', 'LineWidth', 2);  
