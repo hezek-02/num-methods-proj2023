@@ -147,7 +147,7 @@ for i=1:16
   
   [res3,k3] = newton_raphson(x0, JF, F, tol, itMax);
 
-  fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
+  fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
 
   fprintf("resultado: (x=%d  y=%d  z=%d)\n", res3(1),res3(2),res3(3));
   fprintf("cant de iteraciones: %d\n", k3);
@@ -299,7 +299,15 @@ fprintf("cant de iteraciones: %d \n", k1);
 
 fprintf("\nLa ubicación del globo en 0s es: (x=%.15d  y=%.15d  d=%.15d) \n",res2(1),res2(2),res2(3));
 fprintf("cant de iteraciones: %d \n", k2);
+###FIN PARTE5###
 
+
+
+
+
+
+###PARTE 6###
+       
 %valores iniciales
 rho_globo_5s = sqrt(res1(1)^2 + res1(2)^2);
 rho_globo_0s = sqrt(res2(1)^2 + res2(2)^2);
@@ -311,17 +319,16 @@ rho_prima_inicial = (rho_globo_0s - rho_globo_5s)/5;
 theta_prima_inicial = (theta_globo_0s - theta_globo_5s)/5;
 
 g = @(rho) 3.986e5./ (rho^2);  %km^3/s^2
-k = 1; %cte
+k = 3; %cte
 M = 1; %1kg;
 
-v = @(y) sqrt( y(3)^2 +y(1)*y(4)^2 );
 %y(1)  = rho
 %y(2) = theta
 %y(3) = rho'
 %y(4) = theta'
 y0 = [rho_globo_0s, theta_globo_0s, rho_prima_inicial, theta_prima_inicial]';
 
-ec_diferencial = @(t,y)  [  
+F_tY_t = @(t,y)  [  
     y(3);  % rho'
     y(4);  % theta'
     -g(y(1)) - (k/M)  *   v(y)  *   y(3) + y(1)  *  y(4).^2      ; %rho''
@@ -329,27 +336,63 @@ ec_diferencial = @(t,y)  [
                                                                                                                                    
 opciones = odeset('Events', @enSuperficie);
 % Resolver la ecuación diferencial con ode23
-[t, sol] = ode23(ec_diferencial, [0 6000], y0,opciones);
+[t, sol] = ode23(F_tY_t, [0 6000], y0,opciones);
 
 % Graficar resultados
 figure(1);
 subplot(2, 1, 1);
-plot(t, sol(:, 1), 'r', 'LineWidth', 2);  % Rho
-xlabel('Tiempo');
-ylabel('Rho');
+plot(t, sol(:, 1),  'color', [0, 0.5, 0], 'LineWidth', 2);  % Rho
+xlabel('Tiempo en seg');
+ylabel('Rho en km');
 title('Solución de la Ecuación Diferencial: Rho');
 
 subplot(2, 1, 2);
 plot(t, sol(:, 2), 'b', 'LineWidth', 2);  % Theta
-xlabel('Tiempo');
-ylabel('Theta');
+xlabel('Tiempo en seg');
+ylabel('Theta en radianes');
 title('Solución de la Ecuación Diferencial: Theta');
 
 fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  km/s   ( %f km/h),\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f  (segundos),  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end,:)),v(sol(end,:))*3600, t(end),  sol(end,2), sol(end,2)*180/pi);
 
-##figure(1);
-##plot(t, y, 'r', 'LineWidth', 2);  
+###FIN PARTE6###
 
 
-###PARTE 6###
-       
+
+
+
+
+###PARTE 7###
+
+% se q k se encuentra entre 3.17
+kl= 2;
+kh=4;
+it =0;
+velocidad= 0;
+tol = 1e-12;
+vel_tope = 200;
+while (velocidad <vel_tope- tol ||  velocidad >vel_tope- eps)  && it < 500 
+   it = it+1;
+   k = (kh +kl)/2; % analogo al metodo de bisección
+   
+    F_tY_t2 = @(t,y)  [  
+        y(3);  % rho'
+        y(4);  % theta'
+        -g(y(1)) - (k/M)  *   v(y)  *   y(3) + y(1)  *  y(4).^2      ; %rho''
+        -(k/M)    * v(y)    *   y(4)  -   2 * ( y(3) * y(4) )  /  y(1)   ]; %theta''
+        
+    sol =0;
+    [t, sol] = ode23(F_tY_t2, [0 800], y0,opciones);
+    
+    velocidad = v(sol(end,:)) * 3600;
+    rho = sol(end,1);
+    dif = abs(velocidad - vel_tope-tol);
+
+    if (velocidad> vel_tope && it < 500 )
+        kl = k;
+    elseif (velocidad< vel_tope- tol && it < 500)
+        kh = k;
+    endif
+endwhile
+
+fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  km/s   ( %f km/h),\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f  (segundos),  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end,:)),v(sol(end,:))*3600, t(end),  sol(end,2), sol(end,2)*180/pi);
+fprintf("El valor de k es: %f \n", k);
