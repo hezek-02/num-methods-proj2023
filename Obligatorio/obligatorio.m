@@ -14,7 +14,7 @@ S = [15600,   7540,   20140,   0.07074 ;  %satelite 1
        19170,   610,     18390,   0.07242  ];  %satelite 4
 
 F = @(x) sistema_ecs(x,S,0);
-JF = @(x) jacobiana(x,S,0);
+JF = @(x) jacobiana(x,S);
 
 x0 = [0, 0, 6370, 0];
 
@@ -52,7 +52,7 @@ for i=1:4
 endfor
 
 F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S,0);
+JF = @(x) jacobiana(x,S);
 
 x0 = [0, 0, 6370];
 
@@ -73,7 +73,7 @@ for i=1:16
     S(4,4) = t(1,4) + delta_ti(i,4);
 
     F = @(x) sistema_ecs(x,S,d);
-    JF = @(x) jacobiana(x,S,0);
+    JF = @(x) jacobiana(x,S);
 
     x0 = [0, 0, 6370];
 
@@ -120,7 +120,7 @@ endfor
 
 x0 = [0, 0, 6370];
 F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S,0);
+JF = @(x) jacobiana(x,S);
 
 [res2,k2] = newton_raphson(x0, JF, F, tol, itMax);
 res2(4) = d; 
@@ -141,7 +141,7 @@ for i=1:16
   S(4,4) = t_j(1,4) + delta_ti(i,4);
   
   F = @(x) sistema_ecs(x,S,d);
-  JF = @(x) jacobiana(x,S,0);
+  JF = @(x) jacobiana(x,S);
 
   x0 = [0, 0, 6370];
   
@@ -191,7 +191,7 @@ for i =1:8
 endfor
 
 F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S,8);
+JF = @(x) jacobiana(x,S);
  
 %xSol =   [0, 0, 3670, d];
 
@@ -222,11 +222,11 @@ for i=1:256
     y (8,1) = c * (t(1,8) + delta_ti(i,8));
 
     F = @(x) sistema_ecs(x,S,d);
-    JF = @(x) jacobiana(x,S,8);
+    JF = @(x) jacobiana(x,S);
 
     [res3,k3] = gauss_newton(x0, y, JF, F, tol, itMax);
     
-    fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d, %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4),delta_ti(i,5), delta_ti(i,6), delta_ti(i,7), delta_ti(i,8));
+    fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d, %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4),delta_ti(i,5), delta_ti(i,6), delta_ti(i,7), delta_ti(i,8));
     fprintf("resultado: (x=%f  y=%f  z=%f)\n", res3(1), res3(2), res3(3), res3(4));
     fprintf("cant de iteraciones: %d\n", k3);
 
@@ -240,22 +240,23 @@ fprintf("numero de condicion: %d\n ", num_cond);
 
 ###Comparación  de errores perturbados, caso satelites juntos y muchos satélites 8 (min cuad)
 % Gráfica de errores perturbados
-figure(1)
-plot(1:16, log(errores_de_salida(1:16)+1), '-b.', 1:256, log(errores_de_salida_minCuadrados(1:256)+1), '-r.');
-title('Comparación de Errores Perturbados');
-xlabel('Perturbación');
-ylabel('Log(Error + 1)');
-legend('Errores ', 'Errores Mínimos Cuadrados');
-
-% Gráfica de factores de incremento
-figure(2)
-plot(1:16, log(factores_de_incremento(1:16)+1), '-b.', 1:256, log(factores_de_incremento_minCuadrados(1:256)+1), '-r.');
-title('Comparación de Factores de Increm ento del error');
-xlabel('Perturbación');
-ylabel('Log(Factor de Incremento + 1)');
-legend('Factores ', 'Factores Mínimos Cuadrados');
-
 ##figure(1)
+##
+##plot(1:16, log(errores_de_salida(1:16)+1), '-b.', 1:256, log(errores_de_salida_minCuadrados(1:256)+1), '-r.');
+##title('Comparación de Errores Perturbados');
+##xlabel('Perturbación');
+##ylabel('Log(Error + 1)');
+##legend('Errores ', 'Errores Mínimos Cuadrados');
+##
+##% Gráfica de factores de incremento
+##figure(2)
+##plot(1:16, log(factores_de_incremento(1:16)+1), '-b.', 1:256, log(factores_de_incremento_minCuadrados(1:256)+1), '-r.');
+##title('Comparación de Factores de Increm ento del error');
+##xlabel('Perturbación');
+##ylabel('Log(Factor de Incremento + 1)');
+##legend('Factores ', 'Factores Mínimos Cuadrados');
+##
+####figure(1)
 ##plot(1:16, errores_de_salida(1:16), '-b.',1:256, errores_de_salida_minCuadrados(1:256), '-r.');
 ##figure(2)
 ##plot( 1:16, factores_de_incremento(1:16), '-b.', 1:256, factores_de_incremento_minCuadrados(1:256),'-r.');
@@ -263,6 +264,7 @@ legend('Factores ', 'Factores Mínimos Cuadrados');
 
 ## PARTE 5 ##
 fprintf("\n \n PARTE 5 \n \n");
+
 
 d = 0.0001;
 c = 299792.458; %km/s
@@ -280,22 +282,74 @@ S = [rho*cos(theta(1)), rho*sin(theta(1)); %satelite 1
      rho*cos(theta(5)), rho*sin(theta(5)); %satelite 5
      rho*cos(theta(6)), rho*sin(theta(6))]; %satelite 6
 
-F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S,0);
-y = zeros(6,1);
+F   = @(x) sistema_ecs(x,S,d);
+JF  = @(x) jacobiana(x,S);
+y   = zeros(6,1);
 
 x0 = [0,0,0];
 
-y = c * t_5s(1,1:6)'
+y = c * t_5s(1,1:6)';
 [res1,k1] = gauss_newton(x0,y, JF, F, tol, itMax);
 
-y = c * t_0s(1,1:6)'
+y = c * t_0s(1,1:6)';
 [res2,k2] = gauss_newton(x0,y, JF, F, tol, itMax);
 
-fprintf("\nLa ubicación del globo en -5s es: (x=%.15d  y=%.15d  d=%.15d) \n",res1(1),res1(2),res1(3))
+fprintf("\nLa ubicación del globo en -5s es: (x=%.15d  y=%.15d  d=%.15d) \n",res1(1),res1(2),res1(3));
 fprintf("cant de iteraciones: %d \n", k1);
 
-fprintf("\nLa ubicación del globo en 0s es: (x=%.15d  y=%.15d  d=%.15d) \n",res2(1),res2(2),res2(3))
+fprintf("\nLa ubicación del globo en 0s es: (x=%.15d  y=%.15d  d=%.15d) \n",res2(1),res2(2),res2(3));
 fprintf("cant de iteraciones: %d \n", k2);
 
+%valores iniciales
+rho_globo_5s = sqrt(res1(1)^2 + res1(2)^2);
+rho_globo_0s = sqrt(res2(1)^2 + res2(2)^2);
+
+theta_globo_5s = atan(res1(2)/res1(1));
+theta_globo_0s = atan(res2(2)/res2(1));
+
+rho_prima_inicial = (rho_globo_0s - rho_globo_5s)/5;
+theta_prima_inicial = (theta_globo_0s - theta_globo_5s)/5;
+
+g = @(rho) 3.986e5./ (rho^2);  %km^3/s^2
+k = 1; %cte
+M = 1; %1kg;
+
+v = @(y) sqrt( y(3)^2 +y(1)*y(4)^2 );
+%y(1)  = rho
+%y(2) = theta
+%y(3) = rho'
+%y(4) = theta'
+y0 = [rho_globo_0s, theta_globo_0s, rho_prima_inicial, theta_prima_inicial]';
+
+ec_diferencial = @(t,y)  [  
+    y(3);  % rho'
+    y(4);  % theta'
+    -g(y(1)) - (k/M)  *   v(y)  *   y(3) + y(1)  *  y(4).^2      ; %rho''
+    -(k/M)    * v(y)    *   y(4)  -   2 * ( y(3) * y(4) )  /  y(1)   ]; %theta''
+                                                                                                                                   
+opciones = odeset('Events', @enSuperficie);
+% Resolver la ecuación diferencial con ode23
+[t, sol] = ode23(ec_diferencial, [0 6000], y0,opciones);
+
+% Graficar resultados
+figure(1);
+subplot(2, 1, 1);
+plot(t, sol(:, 1), 'r', 'LineWidth', 2);  % Rho
+xlabel('Tiempo');
+ylabel('Rho');
+title('Solución de la Ecuación Diferencial: Rho');
+
+subplot(2, 1, 2);
+plot(t, sol(:, 2), 'b', 'LineWidth', 2);  % Theta
+xlabel('Tiempo');
+ylabel('Theta');
+title('Solución de la Ecuación Diferencial: Theta');
+
+fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  km/s   ( %f km/h),\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f  (segundos),  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end,:)),v(sol(end,:))*3600, t(end),  sol(end,2), sol(end,2)*180/pi);
+
+##figure(1);
+##plot(t, y, 'r', 'LineWidth', 2);  
+
+
+###PARTE 6###
        
