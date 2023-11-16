@@ -226,7 +226,7 @@ for i=1:256
 
     [res3,k3] = gauss_newton(x0, y, JF, F, tol, itMax);
     
-    fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d, %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4),delta_ti(i,5), delta_ti(i,6), delta_ti(i,7), delta_ti(i,8));
+    fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d, %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4),delta_ti(i,5), delta_ti(i,6), delta_ti(i,7), delta_ti(i,8));
     fprintf("resultado: (x=%f  y=%f  z=%f)\n", res3(1), res3(2), res3(3), res3(4));
     fprintf("cant de iteraciones: %d\n", k3);
 
@@ -345,7 +345,7 @@ xlabel('Tiempo');
 ylabel('Theta');
 title('Solución de la Ecuación Diferencial: Theta');
 
-fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  (km/s),\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f  (segundos),  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end,:)), t(end),  sol(end,2), sol(end,2)*180/pi);
+fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  km/s   ( %f km/h),\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f  (segundos),  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end,:)),v(sol(end,:))*3600, t(end),  sol(end,2), sol(end,2)*180/pi);
 
 ##figure(1);
 ##plot(t, y, 'r', 'LineWidth', 2);  
