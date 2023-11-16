@@ -1,8 +1,11 @@
 ###VARIABLES GLOBALES/CTES###
-
+warning('off', 'all'); %Sacar las warning de los events, ojo saca todas las warnings, pero no teniamos maś
 tol = 1e-9
 itMax = 250;
 c = 299792.458; %km/s
+
+
+
 
 ###PARTE 1###
 fprintf("\n \n PARTE 1 \n \n");
@@ -22,10 +25,6 @@ x0 = [0, 0, 6370, 0];
 fprintf("\nResultado newton_raphson: (x=%d  y=%d  z=%d  d=%d)\n",res1(1),res1(2),res1(3),res1(4));
 fprintf("cant de iteraciones: %d \n \n", k1);
 ###FIN PARTE1###
-
-
-
-
 
 
 
@@ -78,10 +77,10 @@ for i=1:16
     x0 = [0, 0, 6370];
 
     [res3,k3] = newton_raphson(x0, JF, F, tol, itMax);
-    fprintf("\nNewton_raphson perturdado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
-
-    fprintf("resultado: (x=%d  y=%d  z=%d)\n", res3(1),res3(2),res3(3));
-    fprintf("cant de iteraciones: %d\n", k3);
+##    fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
+##
+##    fprintf("resultado: (x=%d  y=%d  z=%d)\n", res3(1),res3(2),res3(3));
+##    fprintf("cant de iteraciones: %d\n", k3);
 
     errores_de_salida(1,i) = norm([res2(1) - res3(1),res2(2) - res3(2),res2(3) - res3(3)],inf); %‖(∆x, ∆y, ∆z)‖∞
     factores_de_incremento(1,i) = errores_de_salida(1,i)/(c*10e-8);
@@ -89,13 +88,9 @@ endfor
 
 max_err_salida = max(errores_de_salida);
 num_cond = max(factores_de_incremento);
-fprintf("\n mayor error de salida: %d\n ", max_err_salida);
-fprintf("numero de condicion: %d\n ", num_cond);
+fprintf("Dado perturbaciones realizadas a valores de ti en cada satélite hallamos el  mayor error de salida: %d\n ",max_err_salida);
+fprintf("y el numero de condicion: %d\n ", num_cond);
 ###FIN PARTE 2###
-
-
-
-
 
 
 
@@ -147,10 +142,10 @@ for i=1:16
   
   [res3,k3] = newton_raphson(x0, JF, F, tol, itMax);
 
-  fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
-
-  fprintf("resultado: (x=%d  y=%d  z=%d)\n", res3(1),res3(2),res3(3));
-  fprintf("cant de iteraciones: %d\n", k3);
+##  fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4));
+##
+##  fprintf("resultado: (x=%d  y=%d  z=%d)\n", res3(1),res3(2),res3(3));
+##  fprintf("cant de iteraciones: %d\n", k3);
 
   errores_de_salida(1,i) = norm([res2(1) - res3(1),res2(2) - res3(2),res2(3) - res3(3)],inf); %‖(∆x, ∆y, ∆z)‖∞
   factores_de_incremento(1,i) = errores_de_salida(1,i)/(c*10e-8);
@@ -159,13 +154,9 @@ endfor
 max_err_salida = max(errores_de_salida);
 num_cond = max(factores_de_incremento);
 
-fprintf("\n mayor error de salida: %d\n ", max_err_salida);
-fprintf("numero de condicion: %d\n ", num_cond);
+fprintf("\nDado perturbaciones realizadas a valores de ti en cada satélite hallamos el  mayor error de salida: %d\n ",max_err_salida);
+fprintf("y el numero de condicion: %d\n ", num_cond);
 ###FIN PARTE 3 ###
-
-
-
-
 
 
 
@@ -226,17 +217,17 @@ for i=1:256
 
     [res3,k3] = gauss_newton(x0, y, JF, F, tol, itMax);
     
-    fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d, %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4),delta_ti(i,5), delta_ti(i,6), delta_ti(i,7), delta_ti(i,8));
-    fprintf("resultado: (x=%f  y=%f  z=%f)\n", res3(1), res3(2), res3(3), res3(4));
-    fprintf("cant de iteraciones: %d\n", k3);
+##    fprintf("\nNewton_raphson perturbado,  con delta_ti=(%d, %d, %d, %d, %d, %d, %d, %d): \n" , delta_ti(i,1), delta_ti(i,2), delta_ti(i,3), delta_ti(i,4),delta_ti(i,5), delta_ti(i,6), delta_ti(i,7), delta_ti(i,8));
+##    fprintf("resultado: (x=%f  y=%f  z=%f)\n", res3(1), res3(2), res3(3), res3(4));
+##    fprintf("cant de iteraciones: %d\n", k3);
 
     errores_de_salida_minCuadrados(1,i) = norm([res2(1) - res3(1),res2(2) - res3(2),res2(3) - res3(3), res2(4) - res3(4)],inf); %‖(∆x, ∆y, ∆z)‖∞
     factores_de_incremento_minCuadrados(1,i) = errores_de_salida_minCuadrados(1,i)/(c*10e-8);
 endfor
 max_err_salida = max(errores_de_salida_minCuadrados);
 num_cond = max(factores_de_incremento_minCuadrados);
-fprintf("\n mayor error de salida: %d\n ", max_err_salida);
-fprintf("numero de condicion: %d\n ", num_cond);
+fprintf("\nDado perturbaciones realizadas a valores de ti en cada satélite hallamos el  mayor error de salida: %d\n ", max_err_salida);
+fprintf("y el numero de condicion: %d\n ", num_cond);
 
 ###Comparación  de errores perturbados, caso satelites juntos y muchos satélites 8 (min cuad)
 % Gráfica de errores perturbados
@@ -261,6 +252,9 @@ fprintf("numero de condicion: %d\n ", num_cond);
 ##figure(2)
 ##plot( 1:16, factores_de_incremento(1:16), '-b.', 1:256, factores_de_incremento_minCuadrados(1:256),'-r.');
 ###FIN PARTE 4 ###
+
+
+
 
 ## PARTE 5 ##
 fprintf("\n \n PARTE 5 \n \n");
@@ -303,11 +297,8 @@ fprintf("cant de iteraciones: %d \n", k2);
 
 
 
-
-
-
 ###PARTE 6###
-       
+fprintf("\n \n PARTE 6 \n \n");
 %valores iniciales
 rho_globo_5s = sqrt(res1(1)^2 + res1(2)^2);
 rho_globo_0s = sqrt(res2(1)^2 + res2(2)^2);
@@ -319,7 +310,7 @@ rho_prima_inicial = (rho_globo_0s - rho_globo_5s)/5;
 theta_prima_inicial = (theta_globo_0s - theta_globo_5s)/5;
 
 g = @(rho) 3.986e5./ (rho^2);  %km^3/s^2
-k = 3; %cte
+k = 1; %cte
 M = 1; %1kg;
 
 %y(1)  = rho
@@ -333,10 +324,9 @@ F_tY_t = @(t,y)  [
     y(4);  % theta'
     -g(y(1)) - (k/M)  *   v(y)  *   y(3) + y(1)  *  y(4).^2      ; %rho''
     -(k/M)    * v(y)    *   y(4)  -   2 * ( y(3) * y(4) )  /  y(1)   ]; %theta''
-                                                                                                                                   
 opciones = odeset('Events', @enSuperficie);
 % Resolver la ecuación diferencial con ode23
-[t, sol] = ode23(F_tY_t, [0 6000], y0,opciones);
+[t, sol] = ode23(F_tY_t, [0 1000], y0,opciones);
 
 % Graficar resultados
 figure(1);
@@ -358,10 +348,8 @@ fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es apro
 
 
 
-
-
-
 ###PARTE 7###
+fprintf("\n \n PARTE 7 \n \n");
 
 % se q k se encuentra entre 3.17
 kl= 2;
@@ -370,7 +358,7 @@ it =0;
 velocidad= 0;
 tol = 1e-12;
 vel_tope = 200;
-while (velocidad <vel_tope- tol ||  velocidad >vel_tope- eps)  && it < 500 
+while (velocidad <vel_tope- tol ||  velocidad >vel_tope- eps)  && it < itMax 
    it = it+1;
    k = (kh +kl)/2; % analogo al metodo de bisección
    
@@ -395,4 +383,6 @@ while (velocidad <vel_tope- tol ||  velocidad >vel_tope- eps)  && it < 500
 endwhile
 
 fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  km/s   ( %f km/h),\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f  (segundos),  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end,:)),v(sol(end,:))*3600, t(end),  sol(end,2), sol(end,2)*180/pi);
-fprintf("El valor de k es: %f \n", k);
+fprintf("El valor de k tal que al colisionar con la superficie terrestre el golpe es menor o igual a 200km/h  es: %f \n", k);
+
+###FIN PARTE 7###
