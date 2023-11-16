@@ -9,7 +9,7 @@ function [x,k] = gauss_newton(x0, y, JF, F, tol, itMax)
       n = size(x,1);
       w = S(1:n,1:n) \ z(1:n);
       dif = V*w;
-      x = x + dif
+      x = x + dif;
       k = k+1;
  endwhile
 endfunction
