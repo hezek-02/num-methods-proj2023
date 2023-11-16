@@ -322,20 +322,17 @@ v = @(y) sqrt( y(2)^2 +y(1)*y(3)^2 );
 y0 = [rho_globo_0s, theta_globo_0s, rho_prima_inicial, theta_prima_inicial]';
 
 ec_diferencial = @(t,y)  [  
-    y(3);
-    y(4);
-    -g(y(1)) - (k/M)  *   v(y)  *   y(3) + y(1)  *  y(4).^2      ; %rho_prima_prima
-    -(k/M)    * v(y)    *   y(4)  -   2 * ( y(3) * y(4) )  /  y(1)   ]; %theta_prima_prima
+    y(3);  % rho'
+    y(4);  % theta'
+    -g(y(1)) - (k/M)  *   v(y)  *   y(3) + y(1)  *  y(4).^2      ; %rho''
+    -(k/M)    * v(y)    *   y(4)  -   2 * ( y(3) * y(4) )  /  y(1)   ]; %theta''
                                                                                                                                    
-                                               
-
-##ode23( ec_diferencial, [0 450], y0);
-
+opciones = odeset('Events', @enSuperficie);
 % Resolver la ecuación diferencial con ode23
-[t, sol] = ode23(ec_diferencial, [0: 10:  120000], y0);
+[t, sol] = ode23(ec_diferencial, [0 6000], y0,opciones);
 
 % Graficar resultados
-figure;
+figure(1);
 subplot(2, 1, 1);
 plot(t, sol(:, 1), 'r', 'LineWidth', 2);  % Rho
 xlabel('Tiempo');
@@ -347,6 +344,9 @@ plot(t, sol(:, 2), 'b', 'LineWidth', 2);  % Theta
 xlabel('Tiempo');
 ylabel('Theta');
 title('Solución de la Ecuación Diferencial: Theta');
+
+fprintf("\nLa velocidad de impacto del globo con la superficie terrestre es aproximado: %f  ,\n el tiempo que demoró en colisionar desde t=0 es aproximadamente:  %f,  con un ángulo de %f  radianes ( %f  grados)\n",v(sol(end-4:end-1,1:3)), t(end),  sol(end-2,2), sol(end-2,2)*180/pi);
+
 ##figure(1);
 ##plot(t, y, 'r', 'LineWidth', 2);  
 
