@@ -182,7 +182,7 @@ for i =1:8
 endfor
 
 F = @(x) sistema_ecs(x,S,d);
-JF = @(x) jacobiana(x,S);
+JF = @(x) jacobiana(x,S,8);
  
 %xSol =   [0, 0, 3670, d];
 
@@ -213,7 +213,7 @@ for i=1:256
     y (8,1) = c * (t(1,8) + delta_ti(i,8));
 
     F = @(x) sistema_ecs(x,S,d);
-    JF = @(x) jacobiana(x,S);
+    JF = @(x) jacobiana(x,S,8);
 
     [res3,k3] = gauss_newton(x0, y, JF, F, tol, itMax);
     
